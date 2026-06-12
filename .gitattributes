@@ -1,0 +1,25 @@
+# Windows ↔ Mac で改行コードが混ざらないようにする
+* text=auto
+
+*.dart text
+*.yaml text
+*.yml text
+*.md text
+*.json text
+*.xml text
+*.gradle text
+*.kts text
+*.plist text
+*.html text
+*.css text
+*.js text
+
+*.sh text eol=lf
+*.ps1 text eol=crlf
+
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
