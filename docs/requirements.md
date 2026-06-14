@@ -58,7 +58,7 @@
 - プッシュ通知
 - スコア入力・統計グラフ
 - タグのユーザー定義（管理画面）
-- iOS 実機ビルド（開発環境は Windows）
+- iOS 実機ビルド（Mac 環境・[RELEASE_IOS.md](RELEASE_IOS.md) 参照）
 
 ---
 

@@ -26,8 +26,13 @@
 
 ## お問い合わせ
 
-（公開時に連絡先メールアドレスを記載してください）
+golfrecord.app@gmail.com
 
 ---
 
-Google Play 登録時は、このファイルを GitHub Pages 等で公開し、URL をストアに登録してください。
+## ストア登録時
+
+App Store / Google Play いずれも、このファイルを GitHub Pages 等で公開し、**プライバシーポリシー URL** をストアに登録してください。
+
+- iOS: [RELEASE_IOS.md](RELEASE_IOS.md)
+- 掲載文案: [app-store-listing.md](app-store-listing.md)

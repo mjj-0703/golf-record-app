@@ -1,17 +1,22 @@
-# golf_record_app
+# ゴルフ感覚メモ
 
-A new Flutter project.
+練習・ラウンドの「良かった感覚」「ミスの原因」「次回試すこと」を記録する Flutter アプリ。
 
-## Getting Started
+## 開発
 
-This project is a starting point for a Flutter application.
+```bash
+flutter pub get
+flutter run              # シミュレータ
+flutter run -d MJ --release   # 実機（iOS 26 は release 推奨）
+```
 
-A few resources to get you started if this is your first Flutter project:
+## ドキュメント
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+| ファイル | 内容 |
+|----------|------|
+| [docs/requirements.md](docs/requirements.md) | 要件定義 |
+| [docs/RELEASE_IOS.md](docs/RELEASE_IOS.md) | **App Store 提出手順** |
+| [docs/app-store-listing.md](docs/app-store-listing.md) | 掲載文案・スクリーンショット |
+| [docs/release-checklist.md](docs/release-checklist.md) | リリース前チェックリスト |
+| [docs/PRIVACY.md](docs/PRIVACY.md) | プライバシーポリシー（Web 公開用） |
+| [docs/todo.md](docs/todo.md) | タスク管理 |

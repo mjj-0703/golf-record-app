@@ -90,8 +90,12 @@
 - ⬜ **Git バージョン管理の整備**  
   - 初回コミット、`.gitignore` 確認
 
-- ⬜ **iOS 対応**  
-  - Mac 環境が必要
+- 🔄 **iOS 対応 / App Store 提出**  
+  - ✅ Mac 環境・実機 release 起動
+  - ✅ Bundle ID `com.golfrecord.app`・Xcode 署名
+  - ✅ `docs/RELEASE_IOS.md` / `docs/app-store-listing.md`
+  - ⬜ Apple Developer Program 登録
+  - ⬜ `flutter build ipa` → App Store Connect 提出
 
 ---
 
