@@ -171,6 +171,26 @@ class _RecordListPageState extends State<RecordListPage> {
         }).toList(),
       );
     }
+    if (_tagFilter == kUtilityTag) {
+      return Wrap(
+        spacing: 8,
+        runSpacing: 8,
+        children: kUtilityNumbers.map((number) {
+          final value = number.toString();
+          final isSelected = _tagSubFilter == value;
+          return FilterChip(
+            showCheckmark: false,
+            label: Text('${number}UT'),
+            selected: isSelected,
+            onSelected: (selected) {
+              setState(() {
+                _tagSubFilter = selected ? value : null;
+              });
+            },
+          );
+        }).toList(),
+      );
+    }
     if (_tagFilter == kIronTag) {
       return Wrap(
         spacing: 8,

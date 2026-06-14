@@ -28,11 +28,13 @@ class _RecordFormPageState extends State<RecordFormPage> {
   SessionType _selectedType = SessionType.practice;
   String? _primaryClub;
   int? _woodNumber;
+  int? _utilityNumber;
   int? _ironNumber;
   String? _approachSelection;
   bool _mentalSelected = false;
   bool _showPrimaryClubError = false;
   bool _showWoodNumberError = false;
+  bool _showUtilityNumberError = false;
   bool _showIronNumberError = false;
   bool _showApproachSelectionError = false;
 
@@ -52,6 +54,7 @@ class _RecordFormPageState extends State<RecordFormPage> {
       final parsed = parseTagsForForm(initial.tags);
       _primaryClub = parsed.primaryClub;
       _woodNumber = parsed.woodNumber;
+      _utilityNumber = parsed.utilityNumber;
       _ironNumber = parsed.ironNumber;
       _approachSelection = parsed.approachSelection;
       _mentalSelected = parsed.mentalSelected;
@@ -88,9 +91,11 @@ class _RecordFormPageState extends State<RecordFormPage> {
     _primaryClub = club;
     _showPrimaryClubError = false;
     _woodNumber = null;
+    _utilityNumber = null;
     _ironNumber = null;
     _approachSelection = null;
     _showWoodNumberError = false;
+    _showUtilityNumberError = false;
     _showIronNumberError = false;
     _showApproachSelectionError = false;
   }
@@ -103,6 +108,10 @@ class _RecordFormPageState extends State<RecordFormPage> {
     }
     if (_primaryClub == kWoodTag && _woodNumber == null) {
       _showWoodNumberError = true;
+      hasError = true;
+    }
+    if (_primaryClub == kUtilityTag && _utilityNumber == null) {
+      _showUtilityNumberError = true;
       hasError = true;
     }
     if (_primaryClub == kIronTag && _ironNumber == null) {
@@ -135,6 +144,7 @@ class _RecordFormPageState extends State<RecordFormPage> {
       tags: buildTagsForSave(
         primaryClub: _primaryClub,
         woodNumber: _woodNumber,
+        utilityNumber: _utilityNumber,
         ironNumber: _ironNumber,
         approachSelection: _approachSelection,
         mentalSelected: _mentalSelected,
@@ -252,6 +262,26 @@ class _RecordFormPageState extends State<RecordFormPage> {
                   setState(() {
                     _woodNumber = selected ? number : null;
                     _showWoodNumberError = false;
+                  });
+                },
+              );
+            }).toList(),
+          ),
+        if (_primaryClub == kUtilityTag)
+          _buildSubSelector(
+            title: '番手',
+            showError: _showUtilityNumberError,
+            errorText: '番手を選択してください',
+            chips: kUtilityNumbers.map((number) {
+              final isSelected = _utilityNumber == number;
+              return ChoiceChip(
+                showCheckmark: false,
+                label: Text('${number}UT'),
+                selected: isSelected,
+                onSelected: (selected) {
+                  setState(() {
+                    _utilityNumber = selected ? number : null;
+                    _showUtilityNumberError = false;
                   });
                 },
               );

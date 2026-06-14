@@ -1,5 +1,6 @@
 const kDriverTag = 'ドライバー';
 const kWoodTag = 'ウッド';
+const kUtilityTag = 'ユーティリティ';
 const kIronTag = 'アイアン';
 const kApproachTag = 'アプローチ';
 const kPutterTag = 'パター';
@@ -8,18 +9,22 @@ const kMentalTag = 'メンタル';
 const kPrimaryClubOptions = [
   kDriverTag,
   kWoodTag,
+  kUtilityTag,
   kIronTag,
   kApproachTag,
   kPutterTag,
 ];
 
 const kWoodNumbers = [3, 5, 7];
+const kUtilityNumbers = [3, 4, 5];
 const kIronNumbers = [3, 4, 5, 6, 7, 8, 9];
 const kApproachNamedTypes = ['PW', 'SW'];
 const kApproachLofts = [48, 50, 52, 54, 56, 58, 60];
 const kLegacyApproachTypes = ['GW', 'LW'];
 
 String formatWoodTag(int number) => '$number番$kWoodTag';
+
+String formatUtilityTag(int number) => '$number番$kUtilityTag';
 
 String formatIronTag(int number) => '$number番$kIronTag';
 
@@ -37,6 +42,14 @@ String formatApproachFromSelection(String selection) {
 
 int? parseWoodNumber(String tag) {
   final match = RegExp(r'^(\d+)番ウッド$').firstMatch(tag);
+  if (match == null) {
+    return null;
+  }
+  return int.parse(match.group(1)!);
+}
+
+int? parseUtilityNumber(String tag) {
+  final match = RegExp(r'^(\d+)番ユーティリティ$').firstMatch(tag);
   if (match == null) {
     return null;
   }
@@ -73,6 +86,10 @@ bool isWoodRelatedTag(String tag) {
   return tag == kWoodTag || parseWoodNumber(tag) != null;
 }
 
+bool isUtilityRelatedTag(String tag) {
+  return tag == kUtilityTag || parseUtilityNumber(tag) != null;
+}
+
 bool isIronRelatedTag(String tag) {
   return tag == kIronTag || parseIronNumber(tag) != null;
 }
@@ -100,6 +117,12 @@ bool recordMatchesTagFilter(
     }
     return recordTags.any(isWoodRelatedTag);
   }
+  if (tagFilter == kUtilityTag) {
+    if (subFilter != null) {
+      return recordTags.contains(formatUtilityTag(int.parse(subFilter)));
+    }
+    return recordTags.any(isUtilityRelatedTag);
+  }
   if (tagFilter == kIronTag) {
     if (subFilter != null) {
       return recordTags.contains(formatIronTag(int.parse(subFilter)));
@@ -118,6 +141,7 @@ bool recordMatchesTagFilter(
 typedef FormTagState = ({
   String? primaryClub,
   int? woodNumber,
+  int? utilityNumber,
   int? ironNumber,
   String? approachSelection,
   bool mentalSelected,
@@ -126,6 +150,7 @@ typedef FormTagState = ({
 FormTagState parseTagsForForm(List<String> tags) {
   String? primaryClub;
   int? woodNumber;
+  int? utilityNumber;
   int? ironNumber;
   String? approachSelection;
   var mentalSelected = false;
@@ -145,6 +170,12 @@ FormTagState parseTagsForForm(List<String> tags) {
       woodNumber = wood;
       continue;
     }
+    final utility = parseUtilityNumber(tag);
+    if (utility != null) {
+      primaryClub = kUtilityTag;
+      utilityNumber = utility;
+      continue;
+    }
     final iron = parseIronNumber(tag);
     if (iron != null) {
       primaryClub = kIronTag;
@@ -161,6 +192,8 @@ FormTagState parseTagsForForm(List<String> tags) {
       primaryClub = kDriverTag;
     } else if (tag == kWoodTag) {
       primaryClub = kWoodTag;
+    } else if (tag == kUtilityTag) {
+      primaryClub = kUtilityTag;
     } else if (tag == kIronTag) {
       primaryClub = kIronTag;
     } else if (tag == kApproachTag) {
@@ -173,6 +206,7 @@ FormTagState parseTagsForForm(List<String> tags) {
   return (
     primaryClub: primaryClub,
     woodNumber: woodNumber,
+    utilityNumber: utilityNumber,
     ironNumber: ironNumber,
     approachSelection: approachSelection,
     mentalSelected: mentalSelected,
@@ -182,6 +216,7 @@ FormTagState parseTagsForForm(List<String> tags) {
 List<String> buildTagsForSave({
   required String? primaryClub,
   required int? woodNumber,
+  required int? utilityNumber,
   required int? ironNumber,
   required String? approachSelection,
   required bool mentalSelected,
@@ -194,6 +229,10 @@ List<String> buildTagsForSave({
     case kWoodTag:
       if (woodNumber != null) {
         tags.add(formatWoodTag(woodNumber));
+      }
+    case kUtilityTag:
+      if (utilityNumber != null) {
+        tags.add(formatUtilityTag(utilityNumber));
       }
     case kIronTag:
       if (ironNumber != null) {
@@ -211,11 +250,15 @@ List<String> buildTagsForSave({
 }
 
 bool tagHasSubFilter(String tag) {
-  return tag == kWoodTag || tag == kIronTag || tag == kApproachTag;
+  return tag == kWoodTag ||
+      tag == kUtilityTag ||
+      tag == kIronTag ||
+      tag == kApproachTag;
 }
 
 bool primaryClubNeedsSubSelection(String? primaryClub) {
   return primaryClub == kWoodTag ||
+      primaryClub == kUtilityTag ||
       primaryClub == kIronTag ||
       primaryClub == kApproachTag;
 }
