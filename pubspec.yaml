@@ -1,5 +1,5 @@
 name: golf_record_app
-description: "ゴルフ感覚メモ — 練習・ラウンドの感覚と改善を記録するアプリ"
+description: "FeelShot — 練習・ラウンドの感覚と改善を記録するゴルフアプリ"
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -52,13 +52,13 @@ flutter_launcher_icons:
   android: true
   ios: true
   image_path: assets/icon/app_icon.png
-  adaptive_icon_background: "#388E3C"
+  adaptive_icon_background: "#5BC94A"
   adaptive_icon_foreground: assets/icon/app_icon.png
   web:
     generate: true
     image_path: assets/icon/app_icon.png
-    background_color: "#388E3C"
-    theme_color: "#388E3C"
+    background_color: "#5BC94A"
+    theme_color: "#2D9B4E"
   windows:
     generate: true
     image_path: assets/icon/app_icon.png

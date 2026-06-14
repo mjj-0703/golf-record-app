@@ -14,7 +14,7 @@ void main() {
   testWidgets('record list page is shown', (WidgetTester tester) async {
     await tester.pumpWidget(const GolfRecordApp());
 
-    expect(find.text('ゴルフ感覚メモ'), findsOneWidget);
+    expect(find.text('FeelShot'), findsOneWidget);
     expect(find.byType(FloatingActionButton), findsOneWidget);
   });
 }

@@ -312,7 +312,7 @@ class _RecordListPageState extends State<RecordListPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('ゴルフ感覚メモ')),
+      appBar: AppBar(title: const Text('FeelShot')),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _records.isEmpty

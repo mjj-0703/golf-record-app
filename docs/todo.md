@@ -1,4 +1,4 @@
-# TODO — ゴルフ感覚メモアプリ
+# TODO — FeelShot アプリ
 
 > 本ドキュメントは開発タスクのソースオブトゥルース（SoT）です。  
 > 完了した項目は ✅、未着手は ⬜、進行中は 🔄 で管理してください。
@@ -38,7 +38,7 @@
 
 ### ブランディング
 
-- ✅ アプリ名「ゴルフ感覚メモ」
+- ✅ アプリ名（FeelShot / App Store: FeelShot ゴルフ）
 - ✅ ランチャーアイコン生成（`assets/icon/app_icon.png`）
 
 ---
@@ -88,7 +88,7 @@
 ### 低優先度
 
 - ✅ **アプリ名・アイコン設定**  
-  - 表示名「ゴルフ感覚メモ」、カスタムランチャーアイコン（Android / Web / Windows / iOS）
+  - 表示名「FeelShot」、App Store 名「FeelShot ゴルフ」、カスタムランチャーアイコン（Android / Web / Windows / iOS）
 
 - ⬜ **Git バージョン管理の整備**  
   - 初回コミット、`.gitignore` 確認

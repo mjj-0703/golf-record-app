@@ -1,6 +1,6 @@
 # iOS リリース手順 — App Store 提出
 
-> 対象: ゴルフ感覚メモ（`com.golfrecord.app`）  
+> 対象: FeelShot（App Store: FeelShot ゴルフ、`com.golfrecord.app`）  
 > 開発環境: Mac + Flutter + Xcode
 
 ---
@@ -27,7 +27,9 @@
 | 項目 | 値 |
 |------|-----|
 | Bundle ID | `com.golfrecord.app` |
-| 表示名 | ゴルフ感覚メモ |
+| ホーム画面表示名 | FeelShot |
+| App Store 名 | FeelShot ゴルフ |
+| サブタイトル | 練習・ラウンドの感覚メモ |
 | バージョン | `pubspec.yaml` の `version`（例: `1.0.0+1`） |
 | 最小 iOS | Flutter プロジェクト既定（Xcode で確認） |
 
@@ -116,10 +118,11 @@ flutter build ipa --release
 1. https://appstoreconnect.apple.com/
 2. **マイ App → ＋ → 新規 App**
 3. プラットフォーム: iOS
-4. 名前: **ゴルフ感覚メモ**
-5. プライマリ言語: 日本語
-6. Bundle ID: `com.golfrecord.app`
-7. SKU: 任意（例: `golfrecord-app-001`）
+4. 名前: **FeelShot ゴルフ**
+5. サブタイトル: **練習・ラウンドの感覚メモ**（App Store Connect の別項目）
+6. プライマリ言語: 日本語
+7. Bundle ID: `com.golfrecord.app`
+8. SKU: 任意（例: `golfrecord-app-001`）
 
 ### 5-2. ipa のアップロード
 

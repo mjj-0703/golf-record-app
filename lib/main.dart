@@ -11,7 +11,7 @@ class GolfRecordApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'ゴルフ感覚メモ',
+      title: 'FeelShot',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
         useMaterial3: true,
