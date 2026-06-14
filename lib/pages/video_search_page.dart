@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:golf_record_app/utils/youtube_search_utils.dart';
 
@@ -36,7 +37,7 @@ class _VideoSearchPageState extends State<VideoSearchPage> {
       setState(() {
         _isLaunching = false;
         if (!launched) {
-          _errorMessage = 'ブラウザを開けませんでした';
+          _errorMessage = 'YouTube を開けませんでした';
         }
       });
     } catch (error) {
@@ -45,7 +46,7 @@ class _VideoSearchPageState extends State<VideoSearchPage> {
       }
       setState(() {
         _isLaunching = false;
-        _errorMessage = youtubeLaunchError(error) ?? 'ブラウザを開けませんでした';
+        _errorMessage = youtubeLaunchError(error) ?? 'YouTube を開けませんでした';
       });
     }
   }
@@ -58,6 +59,27 @@ class _VideoSearchPageState extends State<VideoSearchPage> {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('検索ワードをコピーしました')),
     );
+  }
+
+  String get _openDescription {
+    return switch (defaultTargetPlatform) {
+      TargetPlatform.iOS => 'YouTube アプリまたは Safari で検索結果を開きます。',
+      TargetPlatform.android =>
+        'YouTube アプリまたはブラウザで検索結果を開きます。',
+      _ => 'YouTube の検索結果を外部アプリで開きます。',
+    };
+  }
+
+  String? get _troubleshootingNote {
+    return switch (defaultTargetPlatform) {
+      TargetPlatform.iOS =>
+        'YouTube が開かない場合は、App Store で YouTube アプリを'
+        'インストール（または更新）してから、もう一度お試しください。',
+      TargetPlatform.android =>
+        'Play Store の「更新」画面が出た場合、Chrome または YouTube の'
+        '更新が必要です。1回「更新」を押してから、もう一度お試しください。',
+      _ => null,
+    };
   }
 
   @override
@@ -87,7 +109,7 @@ class _VideoSearchPageState extends State<VideoSearchPage> {
           ),
           const SizedBox(height: 8),
           Text(
-            'YouTube の検索結果をブラウザで開きます。',
+            _openDescription,
             style: Theme.of(context).textTheme.bodyMedium,
           ),
           const SizedBox(height: 16),
@@ -115,13 +137,13 @@ class _VideoSearchPageState extends State<VideoSearchPage> {
               style: TextStyle(color: Theme.of(context).colorScheme.error),
             ),
           ],
-          const SizedBox(height: 24),
-          Text(
-            'Play Store の「更新」画面が出た場合\n'
-            'Chrome または YouTube の更新が必要です。1回「更新」を押してから、'
-            '「YouTubeで検索」をもう一度タップしてください。',
-            style: Theme.of(context).textTheme.bodySmall,
-          ),
+          if (_troubleshootingNote case final note?) ...[
+            const SizedBox(height: 24),
+            Text(
+              note,
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+          ],
         ],
       ),
     );

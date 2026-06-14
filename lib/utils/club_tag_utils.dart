@@ -262,3 +262,14 @@ bool primaryClubNeedsSubSelection(String? primaryClub) {
       primaryClub == kIronTag ||
       primaryClub == kApproachTag;
 }
+
+/// 一覧フィルタ用の短い表示名（保存タグとは別）
+String tagFilterChipLabel(String tag) {
+  return switch (tag) {
+    kDriverTag => 'DR',
+    kUtilityTag => 'UT',
+    kApproachTag => 'AW',
+    kPutterTag => 'PT',
+    _ => tag,
+  };
+}

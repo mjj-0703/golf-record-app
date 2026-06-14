@@ -19,7 +19,7 @@ String buildYouTubeSearchQuery({
   return parts.join(' ');
 }
 
-/// YouTube 検索結果ページ（ブラウザ / Custom Tabs で開く）。
+/// YouTube 検索結果ページ（外部アプリ / ブラウザで開く）。
 Uri buildYouTubeSearchUrl(String query) {
   return Uri.https(
     'www.youtube.com',
@@ -28,7 +28,7 @@ Uri buildYouTubeSearchUrl(String query) {
   );
 }
 
-/// Custom Tabs / ブラウザで開く（WebView は使わない）。
+/// 外部アプリ（YouTube / Safari / ブラウザ）で開く。
 Future<bool> launchVideoSearchInBrowser(Uri url) async {
   const modes = [
     LaunchMode.inAppBrowserView,

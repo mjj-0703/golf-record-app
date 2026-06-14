@@ -162,107 +162,139 @@ class _RecordListPageState extends State<RecordListPage> {
     );
   }
 
-  Widget _buildSubFilterChips() {
+  Widget _compactFilterChip({
+    required String label,
+    required bool selected,
+    required ValueChanged<bool> onSelected,
+  }) {
+    return FilterChip(
+      showCheckmark: false,
+      visualDensity: VisualDensity.compact,
+      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      label: Text(
+        label,
+        style: Theme.of(context).textTheme.labelMedium,
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 6),
+      selected: selected,
+      onSelected: onSelected,
+    );
+  }
+
+  Widget _buildHorizontalChipRow(List<Widget> chips) {
+    if (chips.isEmpty) {
+      return const SizedBox.shrink();
+    }
+    return SizedBox(
+      height: 36,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        itemCount: chips.length,
+        separatorBuilder: (_, _) => const SizedBox(width: 6),
+        itemBuilder: (_, index) => chips[index],
+      ),
+    );
+  }
+
+  List<Widget> _buildSubFilterChipWidgets() {
     if (_tagFilter == kWoodTag) {
-      return Wrap(
-        spacing: 8,
-        runSpacing: 8,
-        children: kWoodNumbers.map((number) {
-          final value = number.toString();
-          final isSelected = _tagSubFilter == value;
-          return FilterChip(
-            showCheckmark: false,
-            label: Text('${number}W'),
-            selected: isSelected,
-            onSelected: (selected) {
-              setState(() {
-                _tagSubFilter = selected ? value : null;
-              });
-            },
-          );
-        }).toList(),
-      );
+      return kWoodNumbers.map((number) {
+        final value = number.toString();
+        final isSelected = _tagSubFilter == value;
+        return _compactFilterChip(
+          label: '${number}W',
+          selected: isSelected,
+          onSelected: (selected) {
+            setState(() {
+              _tagSubFilter = selected ? value : null;
+            });
+          },
+        );
+      }).toList();
     }
     if (_tagFilter == kUtilityTag) {
-      return Wrap(
-        spacing: 8,
-        runSpacing: 8,
-        children: kUtilityNumbers.map((number) {
-          final value = number.toString();
-          final isSelected = _tagSubFilter == value;
-          return FilterChip(
-            showCheckmark: false,
-            label: Text('${number}UT'),
-            selected: isSelected,
-            onSelected: (selected) {
-              setState(() {
-                _tagSubFilter = selected ? value : null;
-              });
-            },
-          );
-        }).toList(),
-      );
+      return kUtilityNumbers.map((number) {
+        final value = number.toString();
+        final isSelected = _tagSubFilter == value;
+        return _compactFilterChip(
+          label: '${number}UT',
+          selected: isSelected,
+          onSelected: (selected) {
+            setState(() {
+              _tagSubFilter = selected ? value : null;
+            });
+          },
+        );
+      }).toList();
     }
     if (_tagFilter == kIronTag) {
-      return Wrap(
-        spacing: 8,
-        runSpacing: 8,
-        children: kIronNumbers.map((number) {
-          final value = number.toString();
-          final isSelected = _tagSubFilter == value;
-          return FilterChip(
-            showCheckmark: false,
-            label: Text('$number'),
-            selected: isSelected,
-            onSelected: (selected) {
-              setState(() {
-                _tagSubFilter = selected ? value : null;
-              });
-            },
-          );
-        }).toList(),
-      );
+      return kIronNumbers.map((number) {
+        final value = number.toString();
+        final isSelected = _tagSubFilter == value;
+        return _compactFilterChip(
+          label: '$number',
+          selected: isSelected,
+          onSelected: (selected) {
+            setState(() {
+              _tagSubFilter = selected ? value : null;
+            });
+          },
+        );
+      }).toList();
     }
     if (_tagFilter == kApproachTag) {
-      return Wrap(
-        spacing: 8,
-        runSpacing: 8,
-        children: kApproachSubFilterOptions.map((option) {
-          final label =
-              kApproachNamedTypes.contains(option) ? option : '$option°';
-          final isSelected = _tagSubFilter == option;
-          return FilterChip(
-            showCheckmark: false,
-            label: Text(label),
-            selected: isSelected,
-            onSelected: (selected) {
-              setState(() {
-                _tagSubFilter = selected ? option : null;
-              });
-            },
-          );
-        }).toList(),
-      );
+      return kApproachSubFilterOptions.map((option) {
+        final label =
+            kApproachNamedTypes.contains(option) ? option : '$option°';
+        final isSelected = _tagSubFilter == option;
+        return _compactFilterChip(
+          label: label,
+          selected: isSelected,
+          onSelected: (selected) {
+            setState(() {
+              _tagSubFilter = selected ? option : null;
+            });
+          },
+        );
+      }).toList();
     }
-    return const SizedBox.shrink();
+    return [];
   }
 
   String _subFilterTitle() {
     if (_tagFilter == kApproachTag) {
-      return 'PW / SW / ロフト';
+      return 'ロフト';
     }
     return '番手';
   }
 
   Widget _buildFilterBar() {
     final surfaceColor = Theme.of(context).colorScheme.surface;
+    final tagChips = kTagOptions.map((tag) {
+      final isSelected = _tagFilter == tag;
+      return _compactFilterChip(
+        label: tagFilterChipLabel(tag),
+        selected: isSelected,
+        onSelected: (selected) {
+          setState(() {
+            _tagFilter = selected ? tag : null;
+            if (!selected || !tagHasSubFilter(tag)) {
+              _tagSubFilter = null;
+            }
+          });
+        },
+      );
+    }).toList();
+    final subFilterChips = _buildSubFilterChipWidgets();
+    final showSubFilter =
+        _tagFilter != null && tagHasSubFilter(_tagFilter!) && subFilterChips.isNotEmpty;
 
     return Material(
       color: surfaceColor,
       elevation: 1,
       shadowColor: Theme.of(context).colorScheme.shadow.withValues(alpha: 0.08),
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 10),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -289,35 +321,25 @@ class _RecordListPageState extends State<RecordListPage> {
                 },
               ),
             ),
-            const SizedBox(height: 10),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: kTagOptions.map((tag) {
-                final isSelected = _tagFilter == tag;
-                return FilterChip(
-                  showCheckmark: false,
-                  label: Text(tag),
-                  selected: isSelected,
-                  onSelected: (selected) {
-                    setState(() {
-                      _tagFilter = selected ? tag : null;
-                      if (!selected || !tagHasSubFilter(tag)) {
-                        _tagSubFilter = null;
-                      }
-                    });
-                  },
-                );
-              }).toList(),
-            ),
-            if (_tagFilter != null && tagHasSubFilter(_tagFilter!)) ...[
-              const SizedBox(height: 10),
-              Text(
-                _subFilterTitle(),
-                style: Theme.of(context).textTheme.labelLarge,
-              ),
+            const SizedBox(height: 8),
+            _buildHorizontalChipRow(tagChips),
+            if (showSubFilter) ...[
               const SizedBox(height: 8),
-              _buildSubFilterChips(),
+              SizedBox(
+                height: 36,
+                child: Row(
+                  children: [
+                    Text(
+                      _subFilterTitle(),
+                      style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(child: _buildHorizontalChipRow(subFilterChips)),
+                  ],
+                ),
+              ),
             ],
           ],
         ),

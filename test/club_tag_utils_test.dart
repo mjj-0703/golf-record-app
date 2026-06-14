@@ -109,4 +109,12 @@ void main() {
       expect(saved, ['4番ユーティリティ']);
     });
   });
+
+  group('tagFilterChipLabel', () {
+    test('uses short labels for filter chips only', () {
+      expect(tagFilterChipLabel(kUtilityTag), 'UT');
+      expect(tagFilterChipLabel(kApproachTag), 'AW');
+      expect(tagFilterChipLabel(kIronTag), kIronTag);
+    });
+  });
 }
