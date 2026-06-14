@@ -5,6 +5,7 @@ import 'package:golf_record_app/pages/record_detail_page.dart';
 import 'package:golf_record_app/pages/record_form_page.dart';
 import 'package:golf_record_app/services/record_storage.dart';
 import 'package:golf_record_app/utils/club_tag_utils.dart';
+import 'package:golf_record_app/utils/date_formatter.dart';
 import 'package:golf_record_app/widgets/record_card.dart';
 
 class RecordListPage extends StatefulWidget {
@@ -42,6 +43,16 @@ class _RecordListPageState extends State<RecordListPage> {
       }
       return true;
     }).toList();
+  }
+
+  /// 日付が最も新しく、nextTry が入っている記録（フィルタ前）
+  Record? get _latestNextTryRecord {
+    for (final record in _records) {
+      if (record.nextTry.trim().isNotEmpty) {
+        return record;
+      }
+    }
+    return null;
   }
 
   Future<void> _loadRecords() async {
@@ -243,8 +254,12 @@ class _RecordListPageState extends State<RecordListPage> {
   }
 
   Widget _buildFilterBar() {
+    final surfaceColor = Theme.of(context).colorScheme.surface;
+
     return Material(
+      color: surfaceColor,
       elevation: 1,
+      shadowColor: Theme.of(context).colorScheme.shadow.withValues(alpha: 0.08),
       child: Padding(
         padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
         child: Column(
@@ -309,6 +324,57 @@ class _RecordListPageState extends State<RecordListPage> {
     );
   }
 
+  Widget _buildNextTryBanner(Record record) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final isPractice = record.type == SessionType.practice;
+
+    return Material(
+      color: colorScheme.primaryContainer.withValues(alpha: 0.45),
+      child: InkWell(
+        onTap: () => _openDetailPage(record),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Icon(
+                    Icons.lightbulb_outline,
+                    size: 18,
+                    color: colorScheme.primary,
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    '次回試すこと',
+                    style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                          color: colorScheme.primary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Text(
+                record.nextTry,
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.bodyLarge,
+              ),
+              const SizedBox(height: 6),
+              Text(
+                '${formatRecordDate(record.date)} · ${isPractice ? '練習' : 'ラウンド'}',
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -319,6 +385,8 @@ class _RecordListPageState extends State<RecordListPage> {
               ? _buildEmptyState()
               : Column(
                   children: [
+                    if (_latestNextTryRecord case final record?)
+                      _buildNextTryBanner(record),
                     _buildFilterBar(),
                     Expanded(
                       child: _filteredRecords.isEmpty

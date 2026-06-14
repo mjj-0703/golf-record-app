@@ -10,12 +10,22 @@ class GolfRecordApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = ColorScheme.fromSeed(seedColor: Colors.green);
+
     return MaterialApp(
       title: 'FeelShot',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
+        colorScheme: colorScheme,
         useMaterial3: true,
+        scaffoldBackgroundColor: colorScheme.surface,
+        appBarTheme: AppBarTheme(
+          backgroundColor: colorScheme.surface,
+          foregroundColor: colorScheme.onSurface,
+          surfaceTintColor: Colors.transparent,
+          scrolledUnderElevation: 0,
+        ),
       ),
+      scrollBehavior: const MaterialScrollBehavior().copyWith(overscroll: false),
       home: const RecordListPage(),
       debugShowCheckedModeBanner: false,
     );
