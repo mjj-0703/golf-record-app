@@ -6,6 +6,7 @@ import 'package:golf_record_app/pages/record_form_page.dart';
 import 'package:golf_record_app/services/record_storage.dart';
 import 'package:golf_record_app/utils/club_tag_utils.dart';
 import 'package:golf_record_app/utils/date_formatter.dart';
+import 'package:golf_record_app/widgets/feelshot_title.dart';
 import 'package:golf_record_app/widgets/record_card.dart';
 
 class RecordListPage extends StatefulWidget {
@@ -378,7 +379,7 @@ class _RecordListPageState extends State<RecordListPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('FeelShot')),
+      appBar: AppBar(title: FeelShotTitle()),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _records.isEmpty

@@ -9,12 +9,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:golf_record_app/main.dart';
+import 'package:golf_record_app/widgets/feelshot_title.dart';
 
 void main() {
   testWidgets('record list page is shown', (WidgetTester tester) async {
     await tester.pumpWidget(const GolfRecordApp());
 
-    expect(find.text('FeelShot'), findsOneWidget);
+    expect(find.byType(FeelShotTitle), findsOneWidget);
     expect(find.byType(FloatingActionButton), findsOneWidget);
   });
 }
