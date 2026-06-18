@@ -1,13 +1,19 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:golf_record_app/constants/tag_options.dart';
+import 'package:golf_record_app/data/sample_records.dart';
 import 'package:golf_record_app/models/record.dart';
 import 'package:golf_record_app/pages/record_detail_page.dart';
 import 'package:golf_record_app/pages/record_form_page.dart';
 import 'package:golf_record_app/services/record_storage.dart';
 import 'package:golf_record_app/utils/club_tag_utils.dart';
 import 'package:golf_record_app/utils/date_formatter.dart';
+import 'package:golf_record_app/widgets/club_chip_row.dart';
 import 'package:golf_record_app/widgets/feelshot_title.dart';
 import 'package:golf_record_app/widgets/record_card.dart';
+
+/// `--dart-define=SEED_SCREENSHOTS=true` で debug 起動時にサンプルを自動投入。
+const kSeedScreenshots = bool.fromEnvironment('SEED_SCREENSHOTS');
 
 class RecordListPage extends StatefulWidget {
   const RecordListPage({super.key});
@@ -27,7 +33,14 @@ class _RecordListPageState extends State<RecordListPage> {
   @override
   void initState() {
     super.initState();
-    _loadRecords();
+    _bootstrap();
+  }
+
+  Future<void> _bootstrap() async {
+    await _loadRecords();
+    if (kDebugMode && kSeedScreenshots) {
+      await _loadSampleRecords(silent: true);
+    }
   }
 
   List<Record> get _filteredRecords {
@@ -111,6 +124,24 @@ class _RecordListPageState extends State<RecordListPage> {
     _persistRecords();
   }
 
+  Future<void> _loadSampleRecords({bool silent = false}) async {
+    final samples = screenshotSampleRecords();
+    setState(() {
+      _records
+        ..clear()
+        ..addAll(samples);
+      _records.sort((a, b) => b.date.compareTo(a.date));
+      _typeFilter = null;
+      _tagFilter = null;
+      _tagSubFilter = null;
+    });
+    await _persistRecords();
+    if (!mounted || silent) {
+      return;
+    }
+    _showSnackBar('サンプルデータを投入しました（debug）');
+  }
+
   void _openCreatePage() {
     Navigator.of(context).push(
       MaterialPageRoute(
@@ -167,33 +198,15 @@ class _RecordListPageState extends State<RecordListPage> {
     required bool selected,
     required ValueChanged<bool> onSelected,
   }) {
-    return FilterChip(
-      showCheckmark: false,
-      visualDensity: VisualDensity.compact,
-      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-      label: Text(
-        label,
-        style: Theme.of(context).textTheme.labelMedium,
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 6),
+    return ClubCompactChip(
+      label: label,
       selected: selected,
       onSelected: onSelected,
     );
   }
 
   Widget _buildHorizontalChipRow(List<Widget> chips) {
-    if (chips.isEmpty) {
-      return const SizedBox.shrink();
-    }
-    return SizedBox(
-      height: 36,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        itemCount: chips.length,
-        separatorBuilder: (_, _) => const SizedBox(width: 6),
-        itemBuilder: (_, index) => chips[index],
-      ),
-    );
+    return ClubHorizontalChipRow(chips: chips);
   }
 
   List<Widget> _buildSubFilterChipWidgets() {
@@ -244,8 +257,7 @@ class _RecordListPageState extends State<RecordListPage> {
     }
     if (_tagFilter == kApproachTag) {
       return kApproachSubFilterOptions.map((option) {
-        final label =
-            kApproachNamedTypes.contains(option) ? option : '$option°';
+        final label = approachChipLabel(option);
         final isSelected = _tagSubFilter == option;
         return _compactFilterChip(
           label: label,
@@ -401,7 +413,15 @@ class _RecordListPageState extends State<RecordListPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: FeelShotTitle()),
+      appBar: AppBar(
+        title: kDebugMode
+            ? GestureDetector(
+                onLongPress: () => _loadSampleRecords(),
+                behavior: HitTestBehavior.opaque,
+                child: const FeelShotTitle(),
+              )
+            : const FeelShotTitle(),
+      ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _records.isEmpty

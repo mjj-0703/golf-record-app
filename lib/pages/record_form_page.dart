@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:golf_record_app/constants/validation.dart';
 import 'package:golf_record_app/models/record.dart';
 import 'package:golf_record_app/utils/club_tag_utils.dart';
+import 'package:golf_record_app/widgets/club_chip_row.dart';
 
 class RecordFormPage extends StatefulWidget {
   const RecordFormPage({
@@ -178,35 +179,96 @@ class _RecordFormPageState extends State<RecordFormPage> {
     return null;
   }
 
-  Widget _buildSubSelector({
-    required String title,
-    required List<Widget> chips,
-    required bool showError,
-    required String errorText,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const SizedBox(height: 10),
-        Text(title, style: Theme.of(context).textTheme.labelLarge),
-        const SizedBox(height: 8),
-        Wrap(spacing: 8, runSpacing: 8, children: chips),
-        if (showError)
-          Padding(
-            padding: const EdgeInsets.only(top: 8),
-            child: Text(
-              errorText,
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.error,
-                fontSize: 12,
-              ),
-            ),
-          ),
-      ],
-    );
-  }
-
   Widget _buildClubSection() {
+    final primaryChips = kPrimaryClubOptions.map((club) {
+      final isSelected = _primaryClub == club;
+      return ClubCompactChip(
+        label: tagFilterChipLabel(club),
+        selected: isSelected,
+        onSelected: (selected) {
+          setState(() {
+            if (selected) {
+              _selectPrimaryClub(club);
+            } else if (_primaryClub == club) {
+              _primaryClub = null;
+            }
+          });
+        },
+      );
+    }).toList();
+
+    List<Widget> subChips = [];
+    String subTitle = '番手';
+    if (_primaryClub == kWoodTag) {
+      subChips = kWoodNumbers.map((number) {
+        final isSelected = _woodNumber == number;
+        return ClubCompactChip(
+          label: '${number}W',
+          selected: isSelected,
+          onSelected: (selected) {
+            setState(() {
+              _woodNumber = selected ? number : null;
+              _showWoodNumberError = false;
+            });
+          },
+        );
+      }).toList();
+    } else if (_primaryClub == kUtilityTag) {
+      subChips = kUtilityNumbers.map((number) {
+        final isSelected = _utilityNumber == number;
+        return ClubCompactChip(
+          label: '${number}UT',
+          selected: isSelected,
+          onSelected: (selected) {
+            setState(() {
+              _utilityNumber = selected ? number : null;
+              _showUtilityNumberError = false;
+            });
+          },
+        );
+      }).toList();
+    } else if (_primaryClub == kIronTag) {
+      subChips = kIronNumbers.map((number) {
+        final isSelected = _ironNumber == number;
+        return ClubCompactChip(
+          label: '$number',
+          selected: isSelected,
+          onSelected: (selected) {
+            setState(() {
+              _ironNumber = selected ? number : null;
+              _showIronNumberError = false;
+            });
+          },
+        );
+      }).toList();
+    } else if (_primaryClub == kApproachTag) {
+      subTitle = 'ロフト';
+      subChips = kApproachSubFilterOptions.map((option) {
+        final isSelected = _approachSelection == option;
+        return ClubCompactChip(
+          label: approachChipLabel(option),
+          selected: isSelected,
+          onSelected: (selected) {
+            setState(() {
+              _approachSelection = selected ? option : null;
+              _showApproachSelectionError = false;
+            });
+          },
+        );
+      }).toList();
+    }
+
+    final showSubError = (_primaryClub == kWoodTag && _showWoodNumberError) ||
+        (_primaryClub == kUtilityTag && _showUtilityNumberError) ||
+        (_primaryClub == kIronTag && _showIronNumberError) ||
+        (_primaryClub == kApproachTag && _showApproachSelectionError);
+
+    final subErrorText = switch (_primaryClub) {
+      kWoodTag || kUtilityTag || kIronTag => '番手を選択してください',
+      kApproachTag => 'PW / SW またはロフト角を選択してください',
+      _ => '',
+    };
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -215,27 +277,7 @@ class _RecordFormPageState extends State<RecordFormPage> {
           style: Theme.of(context).textTheme.titleSmall,
         ),
         const SizedBox(height: 8),
-        Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: kPrimaryClubOptions.map((club) {
-            final isSelected = _primaryClub == club;
-            return ChoiceChip(
-              showCheckmark: false,
-              label: Text(club),
-              selected: isSelected,
-              onSelected: (selected) {
-                setState(() {
-                  if (selected) {
-                    _selectPrimaryClub(club);
-                  } else if (_primaryClub == club) {
-                    _primaryClub = null;
-                  }
-                });
-              },
-            );
-          }).toList(),
-        ),
+        ClubHorizontalChipRow(chips: primaryChips),
         if (_showPrimaryClubError)
           Padding(
             padding: const EdgeInsets.only(top: 8),
@@ -247,122 +289,37 @@ class _RecordFormPageState extends State<RecordFormPage> {
               ),
             ),
           ),
-        if (_primaryClub == kWoodTag)
-          _buildSubSelector(
-            title: '番手',
-            showError: _showWoodNumberError,
-            errorText: '番手を選択してください',
-            chips: kWoodNumbers.map((number) {
-              final isSelected = _woodNumber == number;
-              return ChoiceChip(
-                showCheckmark: false,
-                label: Text('${number}W'),
-                selected: isSelected,
-                onSelected: (selected) {
-                  setState(() {
-                    _woodNumber = selected ? number : null;
-                    _showWoodNumberError = false;
-                  });
-                },
-              );
-            }).toList(),
+        if (subChips.isNotEmpty)
+          ClubLabeledChipRow(title: subTitle, chips: subChips),
+        if (showSubError)
+          Padding(
+            padding: const EdgeInsets.only(top: 8),
+            child: Text(
+              subErrorText,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.error,
+                fontSize: 12,
+              ),
+            ),
           ),
-        if (_primaryClub == kUtilityTag)
-          _buildSubSelector(
-            title: '番手',
-            showError: _showUtilityNumberError,
-            errorText: '番手を選択してください',
-            chips: kUtilityNumbers.map((number) {
-              final isSelected = _utilityNumber == number;
-              return ChoiceChip(
-                showCheckmark: false,
-                label: Text('${number}UT'),
-                selected: isSelected,
-                onSelected: (selected) {
-                  setState(() {
-                    _utilityNumber = selected ? number : null;
-                    _showUtilityNumberError = false;
-                  });
-                },
-              );
-            }).toList(),
-          ),
-        if (_primaryClub == kIronTag)
-          _buildSubSelector(
-            title: '番手',
-            showError: _showIronNumberError,
-            errorText: '番手を選択してください',
-            chips: kIronNumbers.map((number) {
-              final isSelected = _ironNumber == number;
-              return ChoiceChip(
-                showCheckmark: false,
-                label: Text('$number'),
-                selected: isSelected,
-                onSelected: (selected) {
-                  setState(() {
-                    _ironNumber = selected ? number : null;
-                    _showIronNumberError = false;
-                  });
-                },
-              );
-            }).toList(),
-          ),
-        if (_primaryClub == kApproachTag) ...[
-          _buildSubSelector(
-            title: 'ウェッジ',
-            showError: false,
-            errorText: '',
-            chips: kApproachNamedTypes.map((type) {
-              final isSelected = _approachSelection == type;
-              return ChoiceChip(
-                showCheckmark: false,
-                label: Text(type),
-                selected: isSelected,
-                onSelected: (selected) {
-                  setState(() {
-                    _approachSelection = selected ? type : null;
-                    _showApproachSelectionError = false;
-                  });
-                },
-              );
-            }).toList(),
-          ),
-          _buildSubSelector(
-            title: 'ロフト角',
-            showError: _showApproachSelectionError,
-            errorText: 'PW / SW またはロフト角を選択してください',
-            chips: kApproachLofts.map((loft) {
-              final value = loft.toString();
-              final isSelected = _approachSelection == value;
-              return ChoiceChip(
-                showCheckmark: false,
-                label: Text('$loft°'),
-                selected: isSelected,
-                onSelected: (selected) {
-                  setState(() {
-                    _approachSelection = selected ? value : null;
-                    _showApproachSelectionError = false;
-                  });
-                },
-              );
-            }).toList(),
-          ),
-        ],
         const SizedBox(height: 12),
         Text(
           '追加（任意）',
           style: Theme.of(context).textTheme.titleSmall,
         ),
         const SizedBox(height: 8),
-        FilterChip(
-          showCheckmark: false,
-          label: Text(kMentalTag),
-          selected: _mentalSelected,
-          onSelected: (selected) {
-            setState(() {
-              _mentalSelected = selected;
-            });
-          },
+        ClubHorizontalChipRow(
+          chips: [
+            ClubCompactChip(
+              label: kMentalTag,
+              selected: _mentalSelected,
+              onSelected: (selected) {
+                setState(() {
+                  _mentalSelected = selected;
+                });
+              },
+            ),
+          ],
         ),
       ],
     );
@@ -374,94 +331,108 @@ class _RecordFormPageState extends State<RecordFormPage> {
       appBar: AppBar(title: Text(_isEdit ? '記録を編集' : '記録を作成')),
       body: Form(
         key: _formKey,
-        child: ListView(
-          padding: const EdgeInsets.all(16),
+        child: Column(
           children: [
-            ListTile(
-              contentPadding: EdgeInsets.zero,
-              title: const Text('日付'),
-              subtitle: Text(
-                '${_selectedDate.year}/${_selectedDate.month}/${_selectedDate.day}',
-              ),
-              trailing: TextButton(
-                onPressed: _pickDate,
-                child: const Text('変更'),
+            Expanded(
+              child: ListView(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                children: [
+                  ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    title: const Text('日付'),
+                    subtitle: Text(
+                      '${_selectedDate.year}/${_selectedDate.month}/${_selectedDate.day}',
+                    ),
+                    trailing: TextButton(
+                      onPressed: _pickDate,
+                      child: const Text('変更'),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  SegmentedButton<SessionType>(
+                    showSelectedIcon: false,
+                    segments: const [
+                      ButtonSegment(
+                        value: SessionType.practice,
+                        label: Text('練習'),
+                      ),
+                      ButtonSegment(
+                        value: SessionType.round,
+                        label: Text('ラウンド'),
+                      ),
+                    ],
+                    selected: {_selectedType},
+                    onSelectionChanged: (selection) {
+                      setState(() {
+                        _selectedType = selection.first;
+                      });
+                    },
+                  ),
+                  const SizedBox(height: 12),
+                  _buildClubSection(),
+                  const SizedBox(height: 12),
+                  TextFormField(
+                    controller: _goodFeelController,
+                    decoration: const InputDecoration(
+                      labelText: '良かった感覚',
+                      border: OutlineInputBorder(),
+                      counterText: '',
+                    ),
+                    maxLength: kMaxRequiredFieldLength,
+                    maxLines: 2,
+                    validator: _requiredValidator,
+                  ),
+                  const SizedBox(height: 10),
+                  TextFormField(
+                    controller: _missCauseController,
+                    decoration: const InputDecoration(
+                      labelText: 'ミスの原因',
+                      border: OutlineInputBorder(),
+                      counterText: '',
+                    ),
+                    maxLength: kMaxRequiredFieldLength,
+                    maxLines: 2,
+                    validator: _requiredValidator,
+                  ),
+                  const SizedBox(height: 10),
+                  TextFormField(
+                    controller: _nextTryController,
+                    decoration: const InputDecoration(
+                      labelText: '次回試すこと',
+                      border: OutlineInputBorder(),
+                      counterText: '',
+                    ),
+                    maxLength: kMaxRequiredFieldLength,
+                    maxLines: 2,
+                    validator: _requiredValidator,
+                  ),
+                  const SizedBox(height: 10),
+                  TextFormField(
+                    controller: _memoController,
+                    decoration: const InputDecoration(
+                      labelText: 'メモ（任意）',
+                      border: OutlineInputBorder(),
+                      counterText: '',
+                    ),
+                    maxLength: kMaxMemoLength,
+                    maxLines: 3,
+                    validator: _memoValidator,
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: 8),
-            SegmentedButton<SessionType>(
-              showSelectedIcon: false,
-              segments: const [
-                ButtonSegment(
-                  value: SessionType.practice,
-                  label: Text('練習'),
+            SafeArea(
+              top: false,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: FilledButton(
+                    onPressed: _submit,
+                    child: const Text('保存'),
+                  ),
                 ),
-                ButtonSegment(
-                  value: SessionType.round,
-                  label: Text('ラウンド'),
-                ),
-              ],
-              selected: {_selectedType},
-              onSelectionChanged: (selection) {
-                setState(() {
-                  _selectedType = selection.first;
-                });
-              },
-            ),
-            const SizedBox(height: 16),
-            _buildClubSection(),
-            const SizedBox(height: 16),
-            TextFormField(
-              controller: _goodFeelController,
-              decoration: const InputDecoration(
-                labelText: '良かった感覚',
-                border: OutlineInputBorder(),
-                counterText: '',
               ),
-              maxLength: kMaxRequiredFieldLength,
-              maxLines: 3,
-              validator: _requiredValidator,
-            ),
-            const SizedBox(height: 12),
-            TextFormField(
-              controller: _missCauseController,
-              decoration: const InputDecoration(
-                labelText: 'ミスの原因',
-                border: OutlineInputBorder(),
-                counterText: '',
-              ),
-              maxLength: kMaxRequiredFieldLength,
-              maxLines: 3,
-              validator: _requiredValidator,
-            ),
-            const SizedBox(height: 12),
-            TextFormField(
-              controller: _nextTryController,
-              decoration: const InputDecoration(
-                labelText: '次回試すこと',
-                border: OutlineInputBorder(),
-                counterText: '',
-              ),
-              maxLength: kMaxRequiredFieldLength,
-              maxLines: 3,
-              validator: _requiredValidator,
-            ),
-            const SizedBox(height: 12),
-            TextFormField(
-              controller: _memoController,
-              decoration: const InputDecoration(
-                labelText: 'メモ（任意）',
-                border: OutlineInputBorder(),
-                counterText: '',
-              ),
-              maxLength: kMaxMemoLength,
-              maxLines: 4,
-              validator: _memoValidator,
-            ),
-            const SizedBox(height: 20),
-            FilledButton(
-              onPressed: _submit,
-              child: const Text('保存'),
             ),
           ],
         ),

@@ -5,7 +5,7 @@ import 'package:golf_record_app/pages/video_search_page.dart';
 import 'package:golf_record_app/utils/date_formatter.dart';
 import 'package:golf_record_app/utils/youtube_search_utils.dart';
 
-class RecordDetailPage extends StatelessWidget {
+class RecordDetailPage extends StatefulWidget {
   const RecordDetailPage({
     required this.record,
     required this.onUpdate,
@@ -16,6 +16,26 @@ class RecordDetailPage extends StatelessWidget {
   final Record record;
   final ValueChanged<Record> onUpdate;
   final ValueChanged<String> onDelete;
+
+  @override
+  State<RecordDetailPage> createState() => _RecordDetailPageState();
+}
+
+class _RecordDetailPageState extends State<RecordDetailPage> {
+  late Record _record;
+
+  @override
+  void initState() {
+    super.initState();
+    _record = widget.record;
+  }
+
+  void _handleUpdate(Record updated) {
+    setState(() {
+      _record = updated;
+    });
+    widget.onUpdate(updated);
+  }
 
   Future<void> _confirmDelete(BuildContext context) async {
     final confirmed = await showDialog<bool>(
@@ -40,14 +60,14 @@ class RecordDetailPage extends StatelessWidget {
       return;
     }
 
-    onDelete(record.id);
+    widget.onDelete(_record.id);
     Navigator.of(context).pop();
   }
 
   void _openYouTubeSearch(BuildContext context) {
     final query = buildYouTubeSearchQuery(
-      missCause: record.missCause,
-      tags: record.tags,
+      missCause: _record.missCause,
+      tags: _record.tags,
     );
 
     Navigator.of(context).push(
@@ -70,8 +90,8 @@ class RecordDetailPage extends StatelessWidget {
               Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (_) => RecordFormPage(
-                    initialRecord: record,
-                    onSave: onUpdate,
+                    initialRecord: _record,
+                    onSave: _handleUpdate,
                   ),
                 ),
               );
@@ -87,18 +107,18 @@ class RecordDetailPage extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
         children: [
-          _DetailHeader(record: record),
+          _DetailHeader(record: _record),
           const SizedBox(height: 16),
           _DetailSection(
             icon: Icons.thumb_up_outlined,
             label: '良かった感覚',
-            value: record.goodFeel,
+            value: _record.goodFeel,
           ),
           const SizedBox(height: 12),
           _DetailSection(
             icon: Icons.error_outline,
             label: 'ミスの原因',
-            value: record.missCause,
+            value: _record.missCause,
             footer: OutlinedButton.icon(
               onPressed: () => _openYouTubeSearch(context),
               icon: const Icon(Icons.play_circle_outline),
@@ -109,15 +129,15 @@ class RecordDetailPage extends StatelessWidget {
           _DetailSection(
             icon: Icons.lightbulb_outline,
             label: '次回試すこと',
-            value: record.nextTry,
+            value: _record.nextTry,
             highlighted: true,
           ),
-          if (record.memo.isNotEmpty) ...[
+          if (_record.memo.isNotEmpty) ...[
             const SizedBox(height: 16),
             _DetailSection(
               icon: Icons.notes,
               label: 'メモ',
-              value: record.memo,
+              value: _record.memo,
               subdued: true,
             ),
           ],
